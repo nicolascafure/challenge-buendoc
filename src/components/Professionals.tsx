@@ -1,4 +1,5 @@
 import { useQuery } from "react-query";
+import { Table, Tag, Space } from 'antd';
 
 interface IProfessional{
 email:string,
@@ -37,10 +38,65 @@ if(query.isLoading){
 if (query.isError){
   return <div>Error cargando profesionales</div>
 }
-console.log(query)
+
+
+
+const columns = [
+  {
+    title: 'Nombre',
+    dataIndex: 'first_name',
+    key: 'first_name',
+  },
+  {
+    title: 'Apellido',
+    dataIndex: 'last_name',
+    key: 'last_name',
+  },
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    key: 'id',
+  },
+  {
+    title: 'Profile',
+    key: 'profile_image',
+    dataIndex: 'profile_image',
+    render: (img:string) => (
+      <>
+       <img src={img}></img>
+      </>
+    ),
+  }
+];
+
+
+
+
+
+
+
+
+
+
     return (<div>
+
   {query.data?.results.map(professional=><p>{professional.email}</p>)}
+
+
+
+  <Table columns={columns} dataSource={query.data?.results} />,
+
+
+
+
+
+
+
   </div>
+
+
+
+
     );
 };
 
