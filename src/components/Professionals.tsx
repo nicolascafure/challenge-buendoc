@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
-import { Table, Tag, Space , Pagination, Button} from 'antd';
-import { useState ,useEffect} from "react";
+import { Table, Pagination, Button} from 'antd';
+import { useState } from "react";
+import CreateProfessional from "./CreateProffesional";
 
 interface IProfessional{
 email:string,
@@ -102,7 +103,7 @@ const columns = [
 
 
 
-
+<CreateProfessional/>
   <Table columns={columns} dataSource={query.data?.results} pagination={false}  />,
   <Pagination onChange={(pageone)=>{
     setPage(pageone)
