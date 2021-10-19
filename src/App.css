@@ -38,3 +38,12 @@
     transform: rotate(360deg);
   }
 }
+
+
+.data-profile-img{
+  width: 25px;
+}
+
+.data-profile-img img{
+  width: 100%;
+}
