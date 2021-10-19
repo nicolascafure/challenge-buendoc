@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { Table, Tag, Space , Pagination} from 'antd';
+import { Table, Tag, Space , Pagination, Button} from 'antd';
 import { useState ,useEffect} from "react";
 
 interface IProfessional{
@@ -71,6 +71,19 @@ const columns = [
     title: 'ID',
     dataIndex: 'id',
     key: 'id',
+  },
+
+  {
+    title: 'Email',
+    dataIndex: 'email',
+    key: 'email',
+  },
+
+  {
+    title: 'Acciones',
+    dataIndex: 'id',
+    key: 'id',
+    render:(id:1) =><><Button type="primary">Editar</Button><Button type="primary" danger>Eliminar</Button></>
   },
   
 ];
