@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Button,Modal } from "antd";
-import { Form, Input, InputNumber} from 'antd';
+import { Form, Input,  message} from 'antd';
+import { Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+
 
 const CreateProfessional : React.FunctionComponent = () => {
     const [visible, setVisible] = useState(false);
@@ -27,11 +30,32 @@ const CreateProfessional : React.FunctionComponent = () => {
       },
     };
 
+    const  beforeUpload = (a:any) => {
+      if (Array.isArray(a)) {
+        return a;
+      }
+    
+      return a && a.fileList;
+    }
+
+    const normFile = (e:any) => {
+      console.log('Upload event:', e);
+    
+      if (Array.isArray(e)) {
+        return e;
+      }
+    
+      return e && e.fileList;
+    };
+
+
+
     const onFinish = (data:object) => {
         console.log(data);
       };
     
 
+    
 
 
 
@@ -49,7 +73,7 @@ const CreateProfessional : React.FunctionComponent = () => {
       >
          <Form {...layout} name="nest-messages" onFinish={onFinish} validateMessages={validateMessages}>
       <Form.Item
-        name={['name']}
+        name={['first_name']}
         label="Nombre"
         rules={[
           {
@@ -60,7 +84,7 @@ const CreateProfessional : React.FunctionComponent = () => {
           <Input />
           </Form.Item>
    <Form.Item
-        name={['lastname']}
+        name={['last_name']}
         label="Apellido"
         rules={[
           {
@@ -77,13 +101,27 @@ const CreateProfessional : React.FunctionComponent = () => {
         label="Email"
         rules={[
           {
+            required: true,
             type: 'email',
           },
         ]}
       >
         <Input />
       </Form.Item>
-      
+
+      <Form.Item
+        name="profile_image"
+        label="Upload"
+        rules={[
+          {
+            required: true,
+          },
+        ]}
+        
+      >
+        
+        <Input type="file" />
+      </Form.Item>
      
       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
         <Button type="primary" htmlType="submit">
