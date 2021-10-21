@@ -39,7 +39,11 @@ async function AddProfessional(data:any) {
     body: formData
   });
   if(!response.ok){
-    throw new Error ("Recuperando lista de profesionales")
+   
+  if(response.status===400){
+    throw new Error("El mail ya fue ingresado en la data");
+  }else{
+    throw new Error ("Recuperando lista de profesionales")}
   }
   return response.json()
 }
@@ -53,7 +57,7 @@ headers:{"Content-type":"application/json"},
     body: JSON.stringify(data)
   });
   if(!response.ok){
-    throw new Error ("Recuperando lista de profesionales")
+    throw new Error ("Recuperando lista lenguajes")
   }
   return response.json()
 }
@@ -66,13 +70,8 @@ const [lenguajes, setLenguajes] =useState([])
 
     
 const mutation = useMutation(AddProfessional,{
-onSettled:function(){
-  console.log("final")
-},
 
 onSuccess:function(data){
-  console.log("listo")
-  console.log(data)
 
 if(lenguajes.length>0 ){
 
@@ -94,26 +93,24 @@ const profesionalLang={
       "is_active": true
     },
     "language_id": result?.id
+
+
   
 }
 
 
 
 mutationLanguajes.mutate(profesionalLang)
+modalSucces("Profesional creado con exito")
 
   } )
 
-
-
 }
-
-
-
 
 },
 
-onError:function(){
-  console.log("error")
+onError:function(error){
+  console.log(error)
 }
 
 
@@ -138,8 +135,8 @@ const mutationLanguajes = useMutation(AddLenguaje,{
   
   },
   
-  onError:function(){
-    console.log("error")
+  onError:function(error){
+    console.log(error)
   }
   
   
@@ -227,18 +224,42 @@ const mutationLanguajes = useMutation(AddLenguaje,{
         return <div>Error cargando Lenguajes</div>}
 
 
+        function modalSucces(text:string) {
+          Modal.success({
+            content: text,
+            onOk(){setVisible(false)}
+          });
+           
+          }
+
+          function modalError(text:any) {
+            Modal.success({
+              content: text,
+            });
+             
+            }
+
+
+
     return(<>
         <Button type="primary" onClick={() => setVisible(true)}>
         Nuevo Profesional
       </Button>
-      <Modal
-        title="Agregar nuevo profesional"
-        centered
-        visible={visible}
-        onOk={() => setVisible(false)}
-        onCancel={() => setVisible(false)}
-        width={800}
-      >
+   
+
+<Modal
+          visible={visible}
+          title="Agregar nuevo profesional"
+          onOk={() => setVisible(false)}
+          onCancel={() => setVisible(false)}
+          width={800}
+          footer={[
+            <Button key="back" onClick={() => setVisible(false)}>
+              Cancelar
+            </Button>,
+         
+          ]}
+        >
          <Form {...layout}     onFinish={onFinish} validateMessages={validateMessages}>
 
          <Form.Item
@@ -290,19 +311,8 @@ const mutationLanguajes = useMutation(AddLenguaje,{
         <Input />
       </Form.Item>
      
-    
 
-      <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
-
-
-
-
-    <Form.Item
+      <Form.Item
         name="lenguajes"
         label="Idiomas"
         rules={[
@@ -313,7 +323,7 @@ const mutationLanguajes = useMutation(AddLenguaje,{
           },
         ]}
       >
-      <Select mode="tags" 
+      <Select mode="multiple" 
         style={{ width: '100%' }}
         placeholder="Selecciona los idiomas que sabés"
         allowClear
@@ -324,6 +334,19 @@ const mutationLanguajes = useMutation(AddLenguaje,{
         </Select>
       </Form.Item>
 
+    
+
+      <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
+        <Button type="primary" htmlType="submit">
+          Crear profesional
+        </Button>
+      </Form.Item>
+    </Form>
+
+
+
+
+   
       </Modal>
     </>
 
