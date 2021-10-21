@@ -45,10 +45,24 @@ async function AddProfessional(data:any) {
 }
 
 
+async function AddLenguaje(data:any) {
+
+  const response= await fetch("http://challenge.radlena.com/api/v1/professional-languages/",{
+headers:{"Content-type":"application/json"},
+    method:"POST",
+    body: JSON.stringify(data)
+  });
+  if(!response.ok){
+    throw new Error ("Recuperando lista de profesionales")
+  }
+  return response.json()
+}
+
+
 
 const CreateProfessional : React.FunctionComponent = () => {
     const [visible, setVisible] = useState(false);
-
+const [lenguajes, setLenguajes] =useState([])
 
     
 const mutation = useMutation(AddProfessional,{
@@ -59,6 +73,43 @@ onSettled:function(){
 onSuccess:function(data){
   console.log("listo")
   console.log(data)
+
+if(lenguajes.length>0 ){
+
+ lenguajes.forEach(lenguaje=>{
+   const professionalId= data.id
+   const result= lang.data?.find(lang=> lang.code===lenguaje)
+
+const profesionalLang={
+  
+    "professional": {
+      "first_name": "string",
+      "last_name": "string",
+      "email": "user@example.com"
+    },
+    "professional_id": professionalId,
+    "language": {
+      "name": "string",
+      "code": "string",
+      "is_active": true
+    },
+    "language_id": result?.id
+  
+}
+
+
+
+mutationLanguajes.mutate(profesionalLang)
+
+  } )
+
+
+
+}
+
+
+
+
 },
 
 onError:function(){
@@ -68,6 +119,44 @@ onError:function(){
 
 })
   
+
+
+
+
+
+const mutationLanguajes = useMutation(AddLenguaje,{
+  onSettled:function(){
+    console.log("final")
+  },
+  
+  onSuccess:function(data){
+    console.log(data)
+  
+
+  
+  
+  
+  },
+  
+  onError:function(){
+    console.log("error")
+  }
+  
+  
+  })
+    
+  
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -103,7 +192,14 @@ onError:function(){
 
 
     const onFinish = (data:object) => {
-      console.log(data)
+      console.log(lenguajes)
+
+     
+
+     
+
+
+
        mutation.mutate(data)
       };
     
@@ -118,7 +214,7 @@ onError:function(){
     };
 
       function handleChange(value:any) {
-        console.log(`selected ${value}`);
+        setLenguajes(value)
       }
 
     
@@ -220,12 +316,11 @@ onError:function(){
       <Select mode="tags" 
         style={{ width: '100%' }}
         placeholder="Selecciona los idiomas que sabés"
+        allowClear
         defaultValue={[]}
         onChange={handleChange}>
-          {lang.data?.map(lenguaje=> <Option value={lenguaje.id}>{lenguaje.name}</Option>)}
-          <Option value="china">China</Option>
-          <Option value="argentina">Argentina</Option>
-          <Option value="brasil">Brasil</Option>
+          {lang.data?.map(lenguaje=> <Option value={lenguaje.code}>{lenguaje.name}</Option>)}
+
         </Select>
       </Form.Item>
 
