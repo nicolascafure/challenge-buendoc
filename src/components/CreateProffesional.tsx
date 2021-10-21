@@ -1,12 +1,55 @@
 import { useState } from "react";
-import { Button,Modal } from "antd";
-import { Form, Input,  message} from 'antd';
-import { Upload } from 'antd';
+import { Button,Modal, Upload ,message} from "antd";
+import { Form, Input, Select} from 'antd';
+import { useMutation } from "react-query";
+
+
 import { UploadOutlined } from '@ant-design/icons';
+
+async function AddProfessional(data:any) {
+  const formData = new FormData();
+
+  formData.append("profile_image", data.profile_image.originFileObj)
+  formData.append('first_name', data.first_name);
+  formData.append('last_name', data.last_name);
+  formData.append("email", data.email)
+  const response= await fetch("http://challenge.radlena.com/api/v1/professionals/",{
+
+    method:"POST",
+    body: formData
+  });
+  if(!response.ok){
+    throw new Error ("Recuperando lista de profesionales")
+  }
+  return response.json()
+}
+
 
 
 const CreateProfessional : React.FunctionComponent = () => {
     const [visible, setVisible] = useState(false);
+
+
+    
+const mutation = useMutation(AddProfessional,{
+onSettled:function(){
+  console.log("final")
+},
+
+onSuccess:function(){
+  console.log("listo")
+},
+
+onError:function(){
+  console.log("error")
+}
+
+
+})
+  
+
+
+
 
  
     const layout = {
@@ -30,30 +73,32 @@ const CreateProfessional : React.FunctionComponent = () => {
       },
     };
 
-    const  beforeUpload = (a:any) => {
-      if (Array.isArray(a)) {
-        return a;
-      }
-    
-      return a && a.fileList;
-    }
 
-    const normFile = (e:any) => {
+    const { Option } = Select;
+
+
+
+
+
+
+    const onFinish = (data:object) => {
+      console.log(data)
+       mutation.mutate(data)
+      };
+    
+     const normFile = (e:any) => {
       console.log('Upload event:', e);
     
       if (Array.isArray(e)) {
         return e;
       }
     
-      return e && e.fileList;
+      return e.file.originFile.Obj ;
     };
 
-
-
-    const onFinish = (data:object) => {
-        console.log(data);
-      };
-    
+      function handleChange(value:any) {
+        console.log(`selected ${value}`);
+      }
 
     
 
@@ -71,7 +116,20 @@ const CreateProfessional : React.FunctionComponent = () => {
         onCancel={() => setVisible(false)}
         width={800}
       >
-         <Form {...layout} name="nest-messages" onFinish={onFinish} validateMessages={validateMessages}>
+         <Form {...layout} method="POST"    onFinish={onFinish} validateMessages={validateMessages}>
+
+         <Form.Item
+        name="profile_image"
+        label="Upload"
+        getValueFromEvent={normFile}
+     
+      >
+        <Upload   action="//jsonplaceholder.typicode.com/posts/"
+          listType="picture"
+         >
+          <Button icon={<UploadOutlined />}>Click to upload</Button>
+        </Upload>
+      </Form.Item>
       <Form.Item
         name={['first_name']}
         label="Nombre"
@@ -108,27 +166,40 @@ const CreateProfessional : React.FunctionComponent = () => {
       >
         <Input />
       </Form.Item>
-
-      <Form.Item
-        name="profile_image"
-        label="Upload"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-        
-      >
-        
-        <Input type="file" />
-      </Form.Item>
      
+    
+
       <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
         <Button type="primary" htmlType="submit">
           Submit
         </Button>
       </Form.Item>
     </Form>
+
+
+
+
+    <Form.Item
+        name="lenguajes"
+        label="Select[multiple]"
+        rules={[
+          {
+            required: true,
+            message: 'Please select your favourite colors!',
+            type: 'array',
+          },
+        ]}
+      >
+        <Select mode="tags" 
+        style={{ width: '100%' }}
+        placeholder="select one country"
+        defaultValue={["brasil"]}
+        onChange={handleChange}>
+          <Option value="china">China</Option>
+          <Option value="argentina">Argentina</Option>
+          <Option value="brasil">Brasil</Option>
+        </Select>
+      </Form.Item>
 
       </Modal>
     </>
