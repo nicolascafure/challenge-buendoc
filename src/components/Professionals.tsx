@@ -1,5 +1,5 @@
-import { useQuery } from "react-query";
-import { Table, Pagination, Button} from 'antd';
+import { useQuery, useMutation ,useQueryClient} from "react-query";
+import { Table, Pagination, Button, Modal} from 'antd';
 import { useState } from "react";
 import CreateProfessional from "./CreateProffesional";
 
@@ -22,6 +22,16 @@ count: number,
 
 
 
+async function deleteProfesional(id:number){
+  await fetch(`http://challenge.radlena.com/api/v1/professionals/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: null
+  })
+}
+
 async function fetchProfessionals(pageN:number){
   const response = await fetch(`http://challenge.radlena.com/api/v1/professionals/?page=${pageN}`)
   if(!response.ok){
@@ -33,7 +43,35 @@ async function fetchProfessionals(pageN:number){
 
 const Professionals : React.FunctionComponent = () => {
 
+  const queryClient = useQueryClient()
+
   const [page, setPage] = useState(1)
+  const deleteMutate= useMutation(deleteProfesional,{
+    onSettled:function(){
+      console.log("final")
+    },
+    
+    onSuccess:function(data){
+      queryClient.invalidateQueries('PROFESSIONALS')
+      modalSucces("Profesional eliminado")
+    
+  
+    
+    
+    
+    },
+    
+    onError:function(error){
+      console.log(error)
+    }
+    
+    
+    })
+
+const eliminarProfesional=(id:number)=>{
+  deleteMutate.mutate(id)
+}
+
 
 const query = useQuery<IResults,Error>(['PROFESSIONALS', page],()=>fetchProfessionals(page), { keepPreviousData : true })
 if(query.isLoading){
@@ -43,6 +81,13 @@ if(query.isLoading){
 if (query.isError){
   return <div>Error cargando profesionales</div>
 }
+
+
+function modalSucces(text:string) {
+  Modal.success({
+    content: text,
+  
+  })}
 
 
  
@@ -84,7 +129,7 @@ const columns = [
     title: 'Acciones',
     dataIndex: 'id',
     key: 'id',
-    render:(id:1) =><><Button type="primary">Editar</Button><Button type="primary" danger>Eliminar</Button></>
+    render:(id:1) =><><Button type="primary">Editar</Button><Button type="primary" danger onClick={()=>eliminarProfesional(id)} >Eliminar</Button></>
   },
   
 ];

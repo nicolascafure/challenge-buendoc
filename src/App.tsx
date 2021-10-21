@@ -1,9 +1,7 @@
 import React from 'react';
 import './App.css';
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
+
   QueryClient,
   QueryClientProvider,
 } from 'react-query'

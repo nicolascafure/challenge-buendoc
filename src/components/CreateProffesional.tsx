@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button,Modal, Upload ,message} from "antd";
 import { Form, Input, Select} from 'antd';
-import { useMutation,  useQuery } from "react-query";
+import { useMutation,  useQuery,useQueryClient } from "react-query";
 import { UploadOutlined } from '@ant-design/icons';
 
 
@@ -65,6 +65,7 @@ headers:{"Content-type":"application/json"},
 
 
 const CreateProfessional : React.FunctionComponent = () => {
+  const queryClient = useQueryClient()
     const [visible, setVisible] = useState(false);
 const [lenguajes, setLenguajes] =useState([])
 
@@ -98,9 +99,8 @@ const profesionalLang={
   
 }
 
-
-
 mutationLanguajes.mutate(profesionalLang)
+queryClient.invalidateQueries('PROFESSIONALS')
 modalSucces("Profesional creado con exito")
 
   } )
@@ -110,6 +110,7 @@ modalSucces("Profesional creado con exito")
 },
 
 onError:function(error){
+  
   console.log(error)
 }
 
