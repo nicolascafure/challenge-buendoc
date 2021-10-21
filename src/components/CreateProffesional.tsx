@@ -1,14 +1,34 @@
 import { useState } from "react";
 import { Button,Modal, Upload ,message} from "antd";
 import { Form, Input, Select} from 'antd';
-import { useMutation } from "react-query";
-
-
+import { useMutation,  useQuery } from "react-query";
 import { UploadOutlined } from '@ant-design/icons';
+
+
+interface ILanguaje{
+  id: number,
+  name: string,
+  code: string,
+  is_active: boolean
+  }
+  
+
+
+
+async function fetchLanguajes(){
+  const response = await fetch(`http://challenge.radlena.com/api/v1/languages/`)
+  if(!response.ok){
+    throw new Error ("Recuperando lista de lenguajes")
+  }
+  return response.json()
+}
+
+
+
+
 
 async function AddProfessional(data:any) {
   const formData = new FormData();
-
   formData.append("profile_image", data.profile_image.originFileObj)
   formData.append('first_name', data.first_name);
   formData.append('last_name', data.last_name);
@@ -36,8 +56,9 @@ onSettled:function(){
   console.log("final")
 },
 
-onSuccess:function(){
+onSuccess:function(data){
   console.log("listo")
+  console.log(data)
 },
 
 onError:function(){
@@ -93,7 +114,7 @@ onError:function(){
         return e;
       }
     
-      return e.file.originFile.Obj ;
+      return e.file ;
     };
 
       function handleChange(value:any) {
@@ -101,7 +122,13 @@ onError:function(){
       }
 
     
-
+      const lang = useQuery<ILanguaje[],Error>(['LANGUAJES'],fetchLanguajes)
+      if(lang.isLoading){
+        return <div>Cargando Lenguajes </div>
+      
+      }
+      if (lang.isError){
+        return <div>Error cargando Lenguajes</div>}
 
 
     return(<>
@@ -116,7 +143,7 @@ onError:function(){
         onCancel={() => setVisible(false)}
         width={800}
       >
-         <Form {...layout} method="POST"    onFinish={onFinish} validateMessages={validateMessages}>
+         <Form {...layout}     onFinish={onFinish} validateMessages={validateMessages}>
 
          <Form.Item
         name="profile_image"
@@ -181,7 +208,7 @@ onError:function(){
 
     <Form.Item
         name="lenguajes"
-        label="Select[multiple]"
+        label="Idiomas"
         rules={[
           {
             required: true,
@@ -190,11 +217,12 @@ onError:function(){
           },
         ]}
       >
-        <Select mode="tags" 
+      <Select mode="tags" 
         style={{ width: '100%' }}
-        placeholder="select one country"
-        defaultValue={["brasil"]}
+        placeholder="Selecciona los idiomas que sabés"
+        defaultValue={[]}
         onChange={handleChange}>
+          {lang.data?.map(lenguaje=> <Option value={lenguaje.id}>{lenguaje.name}</Option>)}
           <Option value="china">China</Option>
           <Option value="argentina">Argentina</Option>
           <Option value="brasil">Brasil</Option>
