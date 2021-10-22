@@ -4,14 +4,10 @@ import { Form, Input, Select} from 'antd';
 import { useMutation,  useQuery,useQueryClient } from "react-query";
 import { UploadOutlined } from '@ant-design/icons';
 import {AddProfessional,AddLenguaje,fetchLanguajes} from "../services/services"
+import { ILanguaje } from "../interfaces/interfaces";
 
 
-interface ILanguaje{
-  id: number,
-  name: string,
-  code: string,
-  is_active: boolean
-  }
+
   
 const CreateProfessional : React.FunctionComponent = () => {
   const queryClient = useQueryClient()
