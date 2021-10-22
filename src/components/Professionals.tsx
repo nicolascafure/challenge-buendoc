@@ -3,6 +3,7 @@ import { Table, Pagination, Button, Modal} from 'antd';
 import { useState } from "react";
 import CreateProfessional from "./CreateProffesional";
 import Edit from "./Edit";
+import {deleteProfesional,fetchProfessionals} from "../services/services"
 
 
 interface IProfessional{
@@ -23,24 +24,6 @@ count: number,
 }
 
 
-
-async function deleteProfesional(id:number){
-  await fetch(`http://challenge.radlena.com/api/v1/professionals/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: null
-  })
-}
-
-async function fetchProfessionals(pageN:number){
-  const response = await fetch(`http://challenge.radlena.com/api/v1/professionals/?page=${pageN}`)
-  if(!response.ok){
-    throw new Error ("Recuperando lista de profesionales")
-  }
-  return response.json()
-}
 
 
 const Professionals : React.FunctionComponent = () => {
@@ -185,7 +168,7 @@ const columns = [
          
           ]}>
 
-<Edit id={proffesionalId} showEdit={showEdit}></Edit>
+<Edit id={proffesionalId} setShowEdit={setShowEdit}></Edit>
 
 
           </Modal>

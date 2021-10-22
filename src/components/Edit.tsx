@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { Button, Modal, Upload, message } from "antd";
-import { Form, Input, Select } from "antd";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { Button, Modal, Upload,Form, Input  } from "antd";
+import { useMutation, useQueryClient } from "react-query";
 import { UploadOutlined } from "@ant-design/icons";
+import {PatchProfessional} from "../services/services"
 
 type EditProps = {
   id: number;
-  showEdit: boolean;
+  setShowEdit: Function;
 };
 
 interface ILanguaje {
@@ -25,48 +24,25 @@ interface IProfessional {
   profile_image: string;
 }
 
-async function PatchProfessional(data: any) {
-  const formData = new FormData();
-  formData.append("profile_image", data.profile_image.originFileObj);
-  formData.append("first_name", data.first_name);
-  formData.append("last_name", data.last_name);
-  formData.append("email", data.email);
-  const response = await fetch(
-    `http://challenge.radlena.com/api/v1/professionals/${data.id}/`,
-    {
-      method: "PATCH",
-      body: formData,
-    }
-  );
-  if (!response.ok) {
-    if (response.status === 400) {
-      throw new Error("El mail ya fue ingresado en la data");
-    } else {
-      throw new Error("Recuperando lista de profesionales");
-    }
-  }
-  return response.json();
-}
 
-
-const EditProfessional: React.FC<EditProps> = ({ id, showEdit }) => {
+const EditProfessional: React.FC<EditProps> = ({ id, setShowEdit }) => {
   const queryClient = useQueryClient();
-
-
-
   const mutation = useMutation(PatchProfessional, {
-    onSuccess: function (data) {
-          queryClient.invalidateQueries("PROFESSIONALS");
-          modalSucces("Profesional modificado con exito");
-     
+    onSuccess: function () {
+      queryClient.invalidateQueries("PROFESSIONALS");
+      modalSucces("Profesional modificado con exito");
+      setShowEdit(false);
     },
 
     onError: function (error) {
       console.log(error);
+      modalError(
+        "Ocurrio un error al modificar el profesional : posible email repetido"
+      );
     },
   });
 
- 
+  
 
   const layout = {
     labelCol: {
@@ -81,47 +57,48 @@ const EditProfessional: React.FC<EditProps> = ({ id, showEdit }) => {
     required: "${label} es requerido",
     types: {
       email: "${label} No es un mail valido!",
-     
     },
-    
   };
 
-
-
   const onFinish = (data: IProfessional) => {
-    const newData={
-      "first_name":data.first_name,
-      "last_name": data.last_name,
-      "id":id,
-      "profile_image": data.profile_image,
-      "email" :data.email
-
-  }
+    const newData = {
+      first_name: data.first_name,
+      last_name: data.last_name,
+      id: id,
+      profile_image: data.profile_image,
+      email: data.email,
+    };
     mutation.mutate(newData);
   };
 
   const normFile = (e: any) => {
-    console.log("Upload event:", e);
-
     if (Array.isArray(e)) {
       return e;
     }
-
     return e.file;
   };
 
+
+  function modalError(text: any) {
+    Modal.error({
+      content: text,
+    });
+  }
 
   function modalSucces(text: string) {
     Modal.success({
       content: text,
     });
   }
-
  
 
   return (
     <>
-      <Form {...layout} onFinish={onFinish} validateMessages={validateMessages}>
+      <Form
+        {...layout}
+        onFinish={onFinish}
+        validateMessages={validateMessages}
+      >
         <Form.Item
           name="profile_image"
           label="Upload"
@@ -174,8 +151,6 @@ const EditProfessional: React.FC<EditProps> = ({ id, showEdit }) => {
         >
           <Input />
         </Form.Item>
-
-        
 
         <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
           <Button type="primary" htmlType="submit">
