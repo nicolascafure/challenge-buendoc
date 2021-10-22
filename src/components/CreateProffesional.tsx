@@ -8,12 +8,13 @@ import {
   fetchLanguajes,
 } from "../services/services";
 import { ILanguaje } from "../interfaces/interfaces";
+import { useForm } from "antd/lib/form/Form";
 
 const CreateProfessional: React.FunctionComponent = () => {
   const queryClient = useQueryClient();
   const [visible, setVisible] = useState(false);
   const [lenguajes, setLenguajes] = useState([]);
-
+  const [form] = Form.useForm();
   const mutation = useMutation(AddProfessional, {
     onSuccess: function (data) {
       if (lenguajes.length > 0) {
@@ -37,9 +38,12 @@ const CreateProfessional: React.FunctionComponent = () => {
           };
 
           mutationLanguajes.mutate(profesionalLang);
-          queryClient.invalidateQueries("PROFESSIONALS");
-          modalSucces("Profesional creado con exito");
+     
+         
         });
+        queryClient.invalidateQueries("PROFESSIONALS");
+        form.resetFields()
+        modalSucces("Profesional creado con exito");
       }
     },
 
@@ -128,14 +132,25 @@ const CreateProfessional: React.FunctionComponent = () => {
         ]}
       >
         <Form
+        form={form}
           {...layout}
           onFinish={onFinish}
           validateMessages={validateMessages}
+          initialValues={{
+            "first_name" :"",
+            "last_name" :"",
+            "profile_image":"",
+            "email":"",
+            "lenguajes": []
+            
+          }
+          }
         >
           <Form.Item
             name="profile_image"
             label="Imagen de perfil"
             getValueFromEvent={normFile}
+           valuePropName="file"
             rules={[
               {
                 required: true,
@@ -202,7 +217,6 @@ const CreateProfessional: React.FunctionComponent = () => {
               style={{ width: "100%" }}
               placeholder="Selecciona los idiomas que sabés"
               allowClear
-              defaultValue={[]}
               onChange={handleChange}
             >
               {lang.data?.map((lenguaje) => (

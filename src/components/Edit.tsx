@@ -2,36 +2,22 @@ import { Button, Modal, Upload,Form, Input  } from "antd";
 import { useMutation, useQueryClient } from "react-query";
 import { UploadOutlined } from "@ant-design/icons";
 import {PatchProfessional} from "../services/services"
-
+import { IProfessional} from "../interfaces/interfaces";
 type EditProps = {
   id: number;
   setShowEdit: Function;
 };
 
-interface ILanguaje {
-  id: number;
-  name: string;
-  code: string;
-  is_active: boolean;
-}
-
-interface IProfessional {
-  email: string;
-  first_name: string;
-  id: number;
-  is_active: boolean;
-  last_name: string;
-  profile_image: string;
-}
-
 
 const EditProfessional: React.FC<EditProps> = ({ id, setShowEdit }) => {
   const queryClient = useQueryClient();
+  const [form] = Form.useForm();
   const mutation = useMutation(PatchProfessional, {
     onSuccess: function () {
       queryClient.invalidateQueries("PROFESSIONALS");
       modalSucces("Profesional modificado con exito");
       setShowEdit(false);
+      form.resetFields()
     },
 
     onError: function (error) {
@@ -41,6 +27,7 @@ const EditProfessional: React.FC<EditProps> = ({ id, setShowEdit }) => {
       );
     },
   });
+
 
   
 
@@ -69,7 +56,11 @@ const EditProfessional: React.FC<EditProps> = ({ id, setShowEdit }) => {
       email: data.email,
     };
     mutation.mutate(newData);
+
+  
   };
+
+
 
   const normFile = (e: any) => {
     if (Array.isArray(e)) {
@@ -95,14 +86,25 @@ const EditProfessional: React.FC<EditProps> = ({ id, setShowEdit }) => {
   return (
     <>
       <Form
+      form={form}
         {...layout}
         onFinish={onFinish}
         validateMessages={validateMessages}
+        initialValues={{
+          "first_name" :"",
+          "last_name" :"",
+          "email":"",
+          "lenguajes": []
+          
+        }
+        }
+
       >
         <Form.Item
           name="profile_image"
           label="Upload"
           getValueFromEvent={normFile}
+          valuePropName="file"
           rules={[
             {
               required: true,
@@ -112,6 +114,7 @@ const EditProfessional: React.FC<EditProps> = ({ id, setShowEdit }) => {
           <Upload
             action="//jsonplaceholder.typicode.com/posts/"
             listType="picture"
+            
           >
             <Button icon={<UploadOutlined />}>Click to upload</Button>
           </Upload>

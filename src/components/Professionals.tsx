@@ -4,7 +4,7 @@ import { useState } from "react";
 import CreateProfessional from "./CreateProffesional";
 import Edit from "./Edit";
 import { deleteProfesional, fetchProfessionals } from "../services/services";
-import { IProfessional, IResults } from "../interfaces/interfaces";
+import { IResults } from "../interfaces/interfaces";
 
 const Professionals: React.FunctionComponent = () => {
   const [showEdit, setShowEdit] = useState(false);
@@ -114,6 +114,7 @@ const Professionals: React.FunctionComponent = () => {
         columns={columns}
         dataSource={query.data?.results}
         pagination={false}
+        rowKey={record => record.id}
       />
       ,
       <Pagination
