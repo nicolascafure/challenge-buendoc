@@ -2,6 +2,8 @@ import { useQuery, useMutation ,useQueryClient} from "react-query";
 import { Table, Pagination, Button, Modal} from 'antd';
 import { useState } from "react";
 import CreateProfessional from "./CreateProffesional";
+import Edit from "./Edit";
+
 
 interface IProfessional{
 email:string,
@@ -42,6 +44,8 @@ async function fetchProfessionals(pageN:number){
 
 
 const Professionals : React.FunctionComponent = () => {
+  const [showEdit, setShowEdit] = useState(false)
+  const[proffesionalId, setId]=useState(1)
 
   const queryClient = useQueryClient()
 
@@ -89,6 +93,18 @@ function modalSucces(text:string) {
   
   })}
 
+  const modalEdit=(id:number)=>{
+    setId(id)
+    setShowEdit(true)
+  }
+
+  const cancelEditModal=()=>{
+    setShowEdit(false)
+
+
+
+
+  }
 
  
 const columns = [
@@ -129,7 +145,7 @@ const columns = [
     title: 'Acciones',
     dataIndex: 'id',
     key: 'id',
-    render:(id:1) =><><Button type="primary">Editar</Button><Button type="primary" danger onClick={()=>eliminarProfesional(id)} >Eliminar</Button></>
+    render:(id:1) =><><Button onClick={()=>modalEdit(id)} type="primary">Editar</Button><Button type="primary" danger onClick={()=>eliminarProfesional(id)} >Eliminar</Button></>
   },
   
 ];
@@ -153,6 +169,26 @@ const columns = [
   <Pagination onChange={(pageone)=>{
     setPage(pageone)
   }} total={query.data?.count} />
+
+
+
+<Modal
+          visible={showEdit}
+          title="Editar profesional"
+          onOk={() => setShowEdit(false)}
+          onCancel={() => cancelEditModal()}
+          width={800}
+          footer={[
+            <Button key="back" onClick={() => cancelEditModal()}>
+              Cancelar
+            </Button>,
+         
+          ]}>
+
+<Edit id={proffesionalId} showEdit={showEdit}></Edit>
+
+
+          </Modal>
 
 
 
